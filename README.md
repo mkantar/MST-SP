@@ -1,4 +1,4 @@
-# MST
+# MST-SP
 
 CENG 412 Algorithms
 

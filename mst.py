@@ -1,3 +1,11 @@
+# CENG 412 HW04 Spring 2018
+# Author: Muharrem Kantar
+# Date: 5/16/2018
+# Implementing Dijkstra's Algorithm For Shortest Path
+
+import sys
+
+
 class Node:
     count = 0
 
@@ -96,6 +104,35 @@ class Graph:
 
         return T
 
+    def shortest_path(self):
+        dst = {}
+        lst = {}
+        source = self.vertices[0].name
+        dst[source] = 0
+        for vertex in self.vertices:
+            if vertex.name != source:
+                dst[vertex.name] = sys.maxsize
+            lst[vertex.name] = vertex
+
+        while lst:
+            m = sys.maxsize
+            min_vertex = 'a'
+            for key, value in lst.items():
+                if dst[key] < m:
+                    m = dst[key]
+                    min_vertex = key
+
+            vertex = lst[min_vertex]
+            lst.pop(min_vertex)
+
+            for adjacent in vertex.adjacents:
+                alt = dst[min_vertex] + adjacent["weight"]
+                if alt < dst[adjacent["node"].name]:
+                    dst[adjacent["node"].name] = alt
+        dst.pop(source)
+        return dst
+
+
     def is_different(self, T, candidate):
         is_found_n1 = False
         if len(T) == 0:
@@ -119,40 +156,53 @@ class Graph:
         return True
 
 
+def print_mst(T):
+    total_weight = 0
+    for edge in T:
+        total_weight = total_weight + edge.weight
+
+    print(total_weight)
+
+    for edge in T:
+        print(edge.n1.name + " " + edge.n2.name)
+
+
+def print_shortest_path(P):
+    for key, value in P.items():
+        print(key, value)
+
+
 def main():
-    n1 = Node('a')
-    n2 = Node('b')
-    n3 = Node('c')
-    n4 = Node('d')
+    val = input()
+    nodes = []
+    vertices = {}
+    while len(val) != 0:
+        val = val.split(' ')
+        nodes.append(val)
+        val = input()
 
-    n1.push({"node": n2, "weight": 5})
-    n1.push({"node": n4, "weight": 1})
+    for node in nodes:
+        vertices[node[0]] = Node(node[0])
 
-    n2.push({"node": n1, "weight": 5})
-    n2.push({"node": n4, "weight": 8})
+    for node in nodes:
+        d = {}
+        for i in range(1, len(node)):
+            if i % 2 == 0:
+                d["weight"] = int(node[i])
+                vertices[node[0]].push(d)
+                d = {}
+            else:
+                d["node"] = vertices[node[i]]
 
-    n3.push({"node": n4, "weight": 15})
+    g = Graph(list(vertices.values()))
 
-    n4.push({"node": n1, "weight": 1})
-    n4.push({"node": n2, "weight": 8})
-    n4.push({"node": n3, "weight": 15})
+    # T = g.mst()
+    #
+    # print_mst(T)
 
-    vertices = [n1, n2, n3, n4]
+    P = g.shortest_path()
 
-    g = Graph(vertices)
-
-    print(g.weights)
-
-    edges = g.edges
-
-    print(sorted(edges))
-
-    for edge in edges:
-        print("edge: " + edge.n1.name + " - " + edge.n2.name + ", w: " + str(edge.weight))
-
-    T = g.mst()
-
-    print(T)
+    print_shortest_path(P)
 
 
 main()
